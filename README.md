@@ -13,7 +13,7 @@ Simple command line utility for debugging WebSocket servers.
 Via `go-get`:
 
 ```
-$ go get github.com/alexanderGugel/wsd
+$ go get github.com/peteclark3/wsd
 ```
 
 ## Usage
