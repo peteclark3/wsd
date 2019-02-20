@@ -37,7 +37,7 @@ func init() {
 	flag.StringVar(&origin, "origin", "http://localhost/", "origin of WebSocket client")
 	flag.StringVar(&url, "url", "ws://localhost:1337/ws", "WebSocket server address to connect to")
 	flag.StringVar(&protocol, "protocol", "", "WebSocket subprotocol")
-	flag.StringVar(&customHeaders, "headers", "", "Custom headers (arg format: name1:value1;name2:value2")
+	flag.StringVar(&customHeaders, "headers", "", "Custom headers (arg format: name1:value1;name2:value2)")
 	flag.BoolVar(&insecureSkipVerify, "insecureSkipVerify", false, "Skip TLS certificate verification")
 	flag.BoolVar(&displayHelp, "help", false, "Display help information about wsd")
 	flag.BoolVar(&displayVersion, "version", false, "Display version number")
