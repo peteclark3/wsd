@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/fatih/color"
@@ -20,6 +21,7 @@ var (
 	origin             string
 	url                string
 	protocol           string
+	customHeaders      string
 	displayHelp        bool
 	displayVersion     bool
 	insecureSkipVerify bool
@@ -35,6 +37,7 @@ func init() {
 	flag.StringVar(&origin, "origin", "http://localhost/", "origin of WebSocket client")
 	flag.StringVar(&url, "url", "ws://localhost:1337/ws", "WebSocket server address to connect to")
 	flag.StringVar(&protocol, "protocol", "", "WebSocket subprotocol")
+	flag.StringVar(&customHeaders, "headers", "", "Custom headers (arg format: name1:value1;name2:value2")
 	flag.BoolVar(&insecureSkipVerify, "insecureSkipVerify", false, "Skip TLS certificate verification")
 	flag.BoolVar(&displayHelp, "help", false, "Display help information about wsd")
 	flag.BoolVar(&displayVersion, "version", false, "Display version number")
@@ -84,7 +87,7 @@ func outLoop(ws *websocket.Conn, out <-chan []byte, errors chan<- error) {
 	}
 }
 
-func dial(url, protocol, origin string) (ws *websocket.Conn, err error) {
+func dial(url, protocol, origin string, customHeaders string) (ws *websocket.Conn, err error) {
 	config, err := websocket.NewConfig(url, origin)
 	if err != nil {
 		return nil, err
@@ -94,6 +97,13 @@ func dial(url, protocol, origin string) (ws *websocket.Conn, err error) {
 	}
 	config.TlsConfig = &tls.Config{
 		InsecureSkipVerify: insecureSkipVerify,
+	}
+	if len(customHeaders) > 0 {
+		var headersArr = strings.Split(customHeaders, ";")
+		for _, header := range headersArr {
+			var headerNVPair = strings.Split(header, ":")
+			config.Header.Set(headerNVPair[0], headerNVPair[1])
+		}
 	}
 	return websocket.DialConfig(config)
 }
@@ -112,7 +122,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	ws, err := dial(url, protocol, origin)
+	ws, err := dial(url, protocol, origin, customHeaders)
 
 	if protocol != "" {
 		fmt.Printf("connecting to %s via %s from %s...\n", yellow(url), yellow(protocol), yellow(origin))
